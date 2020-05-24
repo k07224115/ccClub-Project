@@ -1,3 +1,4 @@
+import pandas as pd
 from selenium import webdriver
 import requests
 from bs4 import BeautifulSoup
@@ -30,7 +31,7 @@ result.to_csv("output.csv", encoding = "utf_8_sig", index = False)
 # translate.append(translator.translate(title_ + "/" + subtitle))
 
 
-# make clickable
+# make clickable and shorten the url
 # link = []
 # for i in result["Link"]:
 #     driver.get(i)
