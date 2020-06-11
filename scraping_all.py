@@ -14,7 +14,7 @@ now = datetime.datetime.now()
 yesterday = datetime.datetime.now() + datetime.timedelta(-1)
 
 translator_a = googletrans.Translator()
-#translator_b = translate.Translator(to_lang = "zh-tw")
+translator_b = translate.Translator(to_lang = "zh-tw")
 
 url = "https://www.bundesregierung.de/breg-de/bundesregierung/staatsministerin-fuer-kultur-und-medien/aktuelles"
 raw_html = requests.get(url).text
@@ -841,8 +841,12 @@ for i in everylist:
     if i.find_all('p', class_='news_list_date')[0].text == time:
         title.append(i.find_all('p', class_='news_list_ttl')[0].text)
         link.append('https://www.bunka.go.jp' + (i.a.get('href')))
-        translate.append(translator.translate(i.find_all('p', class_='news_list_ttl')[0].text, src='ja', dest = 'zh-tw').text)
+        #translate.append(translator.translate(i.find_all('p', class_='news_list_ttl')[0].text, src='ja', dest = 'zh-tw').text)
         date.append(i.find_all('p', class_='news_list_date')[0].text)
+        try:
+            translate.append(translator_a.translate(i.find_all('p', class_='news_list_ttl')[0].text, src='ja', dest = 'zh-tw').text)
+        except:
+            translate.append(translator_b.translate(i.find_all('p', class_='news_list_ttl')[0].text))
     else:
         continue
 
@@ -866,7 +870,11 @@ for i in range(0, len(words), 3):
         date.append(words[i].text.strip())
         title.append(words[i+1].text.strip())
         link.append('https://www.soumu.go.jp' + (words[i+1].a.get('href')))
-        translate.append(translator.translate(words[i+1].text, src='ja', dest = 'zh-tw').text)
+        #translate.append(translator.translate(words[i+1].text, src='ja', dest = 'zh-tw').text)
+        try:
+            translate.append(translator_a.translate(words[i+1].text, dest = "zh-tw").text)
+        except:
+            translate.append(translator_b.translate(words[i+1].text))
     else:
         continue
 
@@ -890,10 +898,18 @@ translator = googletrans.Translator()
 title, link, translate, date = [], [], [], []
 
 for i in newslist.find_all('a'):
-    if translator.translate(i.find_all('div', class_='b-article__date')[0].text, src='ru', dest = 'zh-tw').text == time1 or translator.translate(i.find_all('div', class_='b-article__date')[0].text, src='ru', dest = 'zh-tw').text == time2:
+    try:
+        temp = translator_a.translate(i.find_all('div', class_='b-article__date')[0].text, src='ru', dest = 'zh-tw').text
+    except:
+        temp = translator_b.translate(i.find_all('div', class_='b-article__date')[0].text)
+    if temp == time1 or temp == time2:
         title.append(i.find_all('div', class_='b-default__title')[0].text)
-        translate.append(translator.translate((i.find_all('div', class_='b-default__title')[0].text), src='ru', dest = 'zh-tw').text)
+        #translate.append(translator.translate((i.find_all('div', class_='b-default__title')[0].text), src='ru', dest = 'zh-tw').text)
         link.append('https://www.mkrf.ru' + i.get('href'))
+        try:
+            translate.append(translator_a.translate(i.find_all('div', class_='b-default__title')[0].text, dest = "zh-tw").text)
+        except:
+            translate.append(translator_b.translate(i.find_all('div', class_='b-default__title')[0].text))
         date.append(translator.translate(i.find_all('div', class_='b-article__date')[0].text, src='ru', dest = 'zh-tw').text)
     else:
         continue
@@ -915,8 +931,12 @@ for i in list:
     if i.find_all('span', class_='fecha')[0].text == time:
         title.append(i.find_all('p', class_='titulo')[0].text.strip())
         date.append(i.find_all('span', class_='fecha')[0].text)
-        translate.append(translator.translate(i.find_all('p', class_='titulo')[0].text, src='es', dest = 'zh-tw').text)
+        #translate.append(translator.translate(i.find_all('p', class_='titulo')[0].text, src='es', dest = 'zh-tw').text)
         link.append('https://www.culturaydeporte.gob.es' + (i.a.get('href')))
+        try:
+            translate.append(translator_a.translate(i.find_all('p', class_='titulo')[0].text, dest = "zh-tw").text)
+        except:
+            translate.append(translator_b.translate(i.find_all('p', class_='titulo')[0].text))
     else:
         continue
 
@@ -938,13 +958,20 @@ title, link, translate, date = [], [], [], []
 for i in newslist:
     if i.find_all('div', class_='month_') == []:
         continue
-    elif str(translator.translate(i.find_all('div', class_='month_')[0].text, dest = 'zh-tw').text) + str(i.find_all('div', class_='day_')[0].text) == time:
-        date.append(str(translator.translate(i.find_all('div', class_='month_')[0].text, dest = 'zh-tw').text) + str((i.find_all('div', class_='day_')[0].text)))
-        title.append(i.find_all('h5', class_='card-title _limitrow1')[0].text.strip())
-        translate.append(translator.translate(i.find_all('h5', class_='card-title _limitrow1')[0].text, dest = 'zh-tw').text)
-        link.append('https://www.mkrf.ru' + i.a.get('href'))
     else:
-        continue
+        try:
+            temp = str(translator_a.translate(i.find_all('div', class_='month_')[0].text, dest = 'zh-tw').text)
+        except:
+            temp = str(translator_b.translate(i.find_all('div', class_='month_')[0].text))
+        if (temp + str(i.find_all('div', class_='day_')[0].text)) == time:
+            date.append(str(translator.translate(i.find_all('div', class_='month_')[0].text, dest = 'zh-tw').text) + str((i.find_all('div', class_='day_')[0].text)))
+            title.append(i.find_all('h5', class_='card-title _limitrow1')[0].text.strip())
+            #translate.append(translator.translate(i.find_all('h5', class_='card-title _limitrow1')[0].text, dest = 'zh-tw').text)
+            link.append('https://www.mkrf.ru' + i.a.get('href'))
+            try:
+                translate.append(translator_a.translate(i.find_all('h5', class_='card-title _limitrow1')[0].text, dest = "zh-tw").text)
+            except:
+                translate.append(translator_b.translate(i.find_all('h5', class_='card-title _limitrow1')[0].text))
 
 result1 = pd.DataFrame({"編號":"", "撰寫":"", "搜尋日期":"", "新聞日期":date, "地區別":"", "國家":"", "主題類別":"", "發佈機構/來源":"泰國美術部", "標題翻譯":translate, "標題原文":title, "關鍵字":"", "負責人":"", "連結":link, "備註":""})
 result = result.append(result1 , ignore_index=True)
@@ -956,20 +983,21 @@ soup = BeautifulSoup(re.text, 'html.parser')
 time = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%d/%m/%Y')
 newslist = soup.find_all('div', class_='newsall-work-wrap newsall-comments')
 
-translator = googletrans.Translator()
+#translator = googletrans.Translator()
 title, link, translate, date = [], [], [], []
 
 for i in newslist:
     if i.find_all('p', class_='icon-purple')[1].text.strip() == time:
         title.append(i.h4.text.strip())
-        translate.append(translator.translate(i.h4.text.strip(), dest = 'zh-tw').text)
+        #translate.append(translator.translate(i.h4.text.strip(), dest = 'zh-tw').text)
         date.append(i.find_all('p', class_='icon-purple')[1].text.strip())
         link.append('http://www.m-culture.go.th/en/' + i.a.get('href'))
-    else:
-        continue
+        try:
+            translate.append(translator_a.translate(i.h4.text.strip(), dest = "zh-tw").text)
+        except:
+            translate.append(translator_b.translate(i.h4.text.strip()))
 
 result1 = pd.DataFrame({"編號":"", "撰寫":"", "搜尋日期":"", "新聞日期":date, "地區別":"", "國家":"", "主題類別":"", "發佈機構/來源":"泰國文化部", "標題翻譯":translate, "標題原文":title, "關鍵字":"", "負責人":"", "連結":link, "備註":""})
 result = result.append(result1 , ignore_index=True)
 
-#result.to_csv(f"{now.year}.{now.month}.{now.day - 1}.csv", encoding = "utf_8_sig", index = False)
-result
+result.to_csv(f"{now.year}.{now.month}.{now.day - 1}.csv", encoding = "utf_8_sig", index = False)
