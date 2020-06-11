@@ -25,7 +25,6 @@ content = """\
   </body>
 </html>
 """.format(result.to_html())
-part1 = MIMEText(html, 'html')
 mail.attach(MIMEText(content, "html"))     
 # 將附加檔案們加到email中   
 for file in attachments:
